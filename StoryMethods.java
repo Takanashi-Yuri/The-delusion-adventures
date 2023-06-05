@@ -9,7 +9,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
 public class StoryMethods {
-    // Create new story and character
+
+    // Create new story for specified character
     public static void newStory(Scanner scanner, String characterName) {
         // Create new story and save it to the database
         try {

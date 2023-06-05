@@ -13,6 +13,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class CharacterMethods {
+
+    // Create new character
     public static String[] createNewCharacter(Scanner scanner) {
         // Set user name
         String userName;
@@ -86,7 +88,7 @@ public class CharacterMethods {
                     statement.close();
                     connection.close();
         
-                    System.out.println("Database operations completed successfully.");
+                    System.out.println("Character created successfully.");
                 } catch (Exception e) {
                     System.err.println("Error: " + e.getMessage());
                 }
@@ -141,7 +143,7 @@ public class CharacterMethods {
     
             return characters;
         } catch (Exception e) {
-            System.err.println("Error: " + e.getMessage()); // Just for debugging purposes
+            System.err.println("Error: " + e.getMessage());
             return new String[0]; // Return an empty array if an error occurs
         }
     }

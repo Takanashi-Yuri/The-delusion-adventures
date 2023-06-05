@@ -12,6 +12,7 @@ public class SmallMethods {
         }
     }
 
+    // Sleep for specified time
     public static void sleep(int milliseconds) {
         try {
             Thread.sleep(milliseconds);
@@ -19,5 +20,10 @@ public class SmallMethods {
             System.out.println("Loading stopped, exiting program...");
             System.exit(1);
         }
+    }
+
+    // Create directories if they doesn't exist
+    public static void createDirectory() {
+        
     }
 }

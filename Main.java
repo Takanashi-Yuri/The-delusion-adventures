@@ -26,6 +26,7 @@ public class Main {
         SmallMethods.sleep(1000);
 
         System.out.println("- Loading astral matter...");
+        SmallMethods.createDirectory();
         SmallMethods.sleep(1000);
         
         System.out.println("- Planting ash flowers...");
