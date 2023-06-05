@@ -1,3 +1,4 @@
+// Import the Scanner class
 import java.util.Scanner;
 
 public class Main {
@@ -21,7 +22,7 @@ public class Main {
 
     // Method for displaying loading screen
     public static void displayLoadingScreen() {
-        System.out.println("Welcome to the Adventure");
+        System.out.println("Welcome to the Text adventures");
         SmallMethods.sleep(1000);
 
         System.out.println("- Loading astral matter...");
@@ -58,38 +59,7 @@ public class Main {
 
                 switch (option.toLowerCase()) {
                     case "new":
-                        System.out.println("Select existing character or create new one.");
-
-                        // Retrieve existing characters
-                        String[] characters = CharacterMethods.getExistingCharacters();
-
-                        // Display character menu
-                        System.out.println("Available characters:\n");
-                        for (int i = 0; i < characters.length; i++) {
-                            System.out.println((i + 1) + ". " + characters[i]);
-                        }
-                        System.out.println("New character");
-                        System.out.println();
-                        
-                        System.out.print("~> ");
-
-                        String characterSelection = scanner.nextLine().trim();
-
-                        if (characterSelection.equals("New character")) {
-                            // Welcome message
-                            String introduction = "Hi, my name is Nanami, and I am your companion on this journey.\n" + "First, we'll create your character that will represent you.\n";
-                            SmallMethods.slowPrint(introduction);
-                            System.out.println();
-
-                            // Create new character
-                            String[] userInfo = CharacterMethods.createNewCharacter(scanner);
-
-                            // Create new story
-                            StoryMethods.newStory(scanner, userInfo[0]);
-                        } else {
-                            StoryMethods.newStory(scanner, characterSelection);
-                        }
-
+                        handleMainMenuNew(scanner);
                         break;
                     case "load":
                         // Implement the code for loading an existing story
@@ -105,6 +75,47 @@ public class Main {
                 }
 
                 System.out.println();
+            }
+        }
+    }
+
+    // Method for handling Main menu new story section
+    public static void handleMainMenuNew(Scanner scanner) {
+        System.out.println("Select existing character or create new one.");
+
+        // Retrieve existing characters
+        String[] characters = CharacterMethods.getExistingCharacters();
+
+        // Display character menu
+        System.out.println("Available characters:");
+        for (int i = 0; i < characters.length; i++) {
+            System.out.println("- " + characters[i]);
+        }
+        System.out.println("- New character");
+        while (true) {
+            System.out.print("~> ");
+
+            String characterSelection = scanner.nextLine().trim();
+
+            if (characterSelection.equals("New character")) {
+                // Welcome message
+                System.out.println();
+                String introduction = "Hi, my name is Nanami, and I am your companion on this journey.\n" + "First, we'll create your character that will represent you.\n";
+                SmallMethods.slowPrint(introduction);
+                System.out.println();
+
+                // Create new character
+                String[] userInfo = CharacterMethods.createNewCharacter(scanner);
+
+                // Create new story
+                StoryMethods.newStory(scanner, userInfo[0]);
+                break;
+            } else if (characterSelection.isBlank()) {
+                System.out.println("Error: Character name cannot be empty!");
+            } else {
+                // Create new story for existing character
+                StoryMethods.newStory(scanner, characterSelection);
+                break;
             }
         }
     }

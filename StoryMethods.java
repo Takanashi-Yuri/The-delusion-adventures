@@ -1,5 +1,7 @@
-import java.util.Scanner;  // Import the Scanner class
+// Import the Scanner class
+import java.util.Scanner;
 
+// Import libraries for databases
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.Statement;
@@ -21,7 +23,7 @@ public class StoryMethods {
             Statement statement = connection.createStatement();
 
             // Create the stories table if it doesn't exist
-            String createStoriesTableQuery = "CREATE TABLE IF NOT EXISTS stories (id INTEGER PRIMARY KEY, characterId INTEGER, storyText TEXT, FOREIGN KEY (characterId) REFERENCES characters(id))";
+            String createStoriesTableQuery = "CREATE TABLE IF NOT EXISTS stories (id INTEGER PRIMARY KEY, characterId INTEGER, storyName TEXT, FOREIGN KEY (characterId) REFERENCES characters(id))";
             statement.execute(createStoriesTableQuery);
 
             // Retrieve the character's ID from the characters table
@@ -35,17 +37,25 @@ public class StoryMethods {
                 characterId = characterIdResult.getInt("id");
 
                 // Prompt the user to enter the story text
-                System.out.print("Enter the story name (save name): ");
-                String storyText = scanner.nextLine().trim();
+                System.out.println("Enter the story name (save name).");
+                while (true) {
+                    System.out.print("~> ");
+                    String storyName = scanner.nextLine().trim();
 
-                // Insert the story into the stories table
-                String insertStoryQuery = "INSERT INTO stories (characterId, storyText) VALUES (?, ?)";
-                PreparedStatement insertStoryStatement = connection.prepareStatement(insertStoryQuery);
-                insertStoryStatement.setInt(1, characterId);
-                insertStoryStatement.setString(2, storyText);
-                insertStoryStatement.executeUpdate();
+                    if (!storyName.isBlank()) {
+                        // Insert the story into the stories table
+                        String insertStoryQuery = "INSERT INTO stories (characterId, storyName) VALUES (?, ?)";
+                        PreparedStatement insertStoryStatement = connection.prepareStatement(insertStoryQuery);
+                        insertStoryStatement.setInt(1, characterId);
+                        insertStoryStatement.setString(2, storyName);
+                        insertStoryStatement.executeUpdate();
 
-                System.out.println("Story saved successfully!");
+                        System.out.println("Story saved successfully!");
+                        break;
+                    } else {
+                        System.out.println("Error: Story name cannot be empty!");
+                    }
+                }
             } else {
                 System.out.println("Character not found!");
             }
@@ -60,7 +70,7 @@ public class StoryMethods {
         }
     }
 
-    // Load existing story
+    // Load existing story - currently not working
     public static void loadStory(Scanner scanner) {
         String introduction = "Please insert your character name for list of existing stories\n~> ";
         SmallMethods.slowPrint(introduction);

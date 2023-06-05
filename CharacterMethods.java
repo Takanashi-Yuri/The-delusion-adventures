@@ -19,6 +19,7 @@ public class CharacterMethods {
         do {
             System.out.print("Please enter your name (Or nickname).\n~> ");
             userName = scanner.nextLine().trim();  // Read user input
+            System.out.println();
             if (userName.isEmpty()) {
                 System.out.print("Error: Your name (nickname) cannot be blank!\n");
             }
@@ -29,16 +30,22 @@ public class CharacterMethods {
 
         String userGender = scanner.nextLine().trim();  // Read user input
 
+        System.out.println();
+
         // Set orientation
         System.out.print("Please enter your orientation (Or leave blank).\n~> ");
 
         String userOrientation = scanner.nextLine().trim();  // Read user input
+
+        System.out.println();
 
         // Set pronouns
         String userPronouns;
         do {
             System.out.print("Please enter your pronouns in the format 'she/her' (Used for correct storytelling).\n~> ");
             userPronouns = scanner.nextLine().trim();  // Read user input
+
+            System.out.println();
 
             try {
                 String[] pronounsParts = userPronouns.split("/");
@@ -134,7 +141,7 @@ public class CharacterMethods {
     
             return characters;
         } catch (Exception e) {
-            System.err.println("Error: " + e.getMessage());
+            System.err.println("Error: " + e.getMessage()); // Just for debugging purposes
             return new String[0]; // Return an empty array if an error occurs
         }
     }
