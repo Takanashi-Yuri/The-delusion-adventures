@@ -59,24 +59,32 @@ public class Main {
                 switch (option.toLowerCase()) {
                     case "new":
                         System.out.println("Select existing character or create new one.");
+
+                        // Retrieve existing characters
+                        String[] characters = CharacterMethods.getExistingCharacters();
+
+                        // Display character menu
+                        System.out.println("Available characters:\n");
+                        for (int i = 0; i < characters.length; i++) {
+                            System.out.println((i + 1) + ". " + characters[i]);
+                        }
+                        System.out.println("New character");
                         System.out.println();
-
-                        // Somehow load exisitng characters
-                        // ....
-
-                        String[] characterMenuOptions = {
-                            "Character1",
-                            "Character2",
-                            "New character"
-                        };
                         
-                        System.out.println(String.join("\n", characterMenuOptions));
                         System.out.print("~> ");
 
                         String characterSelection = scanner.nextLine().trim();
 
                         if (characterSelection.equals("New character")) {
+                            // Welcome message
+                            String introduction = "Hi, my name is Nanami, and I am your companion on this journey.\n" + "First, we'll create your character that will represent you.\n";
+                            SmallMethods.slowPrint(introduction);
+                            System.out.println();
+
+                            // Create new character
                             String[] userInfo = CharacterMethods.createNewCharacter(scanner);
+
+                            // Create new story
                             StoryMethods.newStory(scanner, userInfo[0]);
                         } else {
                             StoryMethods.newStory(scanner, characterSelection);

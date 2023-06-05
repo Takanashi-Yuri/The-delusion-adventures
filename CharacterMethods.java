@@ -1,9 +1,16 @@
-import java.util.Scanner;  // Import the Scanner class
+// Import the Scanner class
+import java.util.Scanner;
 
+// Import libraries for databases
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.Statement;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+
+// Import libraries for hashmaps
+import java.util.HashMap;
+import java.util.Map;
 
 public class CharacterMethods {
     public static String[] createNewCharacter(Scanner scanner) {
@@ -44,7 +51,7 @@ public class CharacterMethods {
                     Class.forName("org.sqlite.JDBC");
         
                     // Connect to the SQLite database
-                    Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db");
+                    Connection connection = DriverManager.getConnection("jdbc:sqlite:data/main.db");
         
                     // Create a statement
                     Statement statement = connection.createStatement();
@@ -83,5 +90,52 @@ public class CharacterMethods {
                 System.out.print("Error: Invalid format of the pronouns! Please enter pronouns in the format 'she/her'.\n");
             }
         } while (true);
+    }
+
+    // Method to retrieve existing characters
+    public static String[] getExistingCharacters() {
+        // Save the information to a file - still in testing
+        try {
+            // Load the SQLite JDBC driver
+            Class.forName("org.sqlite.JDBC");
+    
+            // Connect to the SQLite database
+            Connection connection = DriverManager.getConnection("jdbc:sqlite:data/main.db");
+    
+            // Create a statement
+            Statement statement = connection.createStatement();
+    
+            // Retrieve the character names and IDs from the characters table
+            String getCharacterInfoQuery = "SELECT id, userName FROM characters";
+            ResultSet resultSet = statement.executeQuery(getCharacterInfoQuery);
+    
+            // Create a map to store character names by ID
+            Map<Integer, String> characterMap = new HashMap<>();
+    
+            // Retrieve the character names and IDs and store them in the map
+            while (resultSet.next()) {
+                int characterId = resultSet.getInt("id");
+                String characterName = resultSet.getString("userName");
+                characterMap.put(characterId, characterName);
+            }
+    
+            // Close the result set, statement, and connection
+            resultSet.close();
+            statement.close();
+            connection.close();
+    
+            // Create an array to store the character names sorted by ID
+            String[] characters = new String[characterMap.size()];
+            for (Map.Entry<Integer, String> entry : characterMap.entrySet()) {
+                int characterId = entry.getKey();
+                String characterName = entry.getValue();
+                characters[characterId - 1] = characterName;
+            }
+    
+            return characters;
+        } catch (Exception e) {
+            System.err.println("Error: " + e.getMessage());
+            return new String[0]; // Return an empty array if an error occurs
+        }
     }
 }
