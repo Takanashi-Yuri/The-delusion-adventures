@@ -12,7 +12,7 @@ import java.sql.ResultSet;
 import java.util.HashMap;
 import java.util.Map;
 
-public class CharacterMethods {
+public class CharacterManaging {
 
     // Create new character
     public static String[] createNewCharacter(Scanner scanner) {
@@ -46,8 +46,6 @@ public class CharacterMethods {
         do {
             System.out.print("Please enter your pronouns in the format 'she/her' (Used for correct storytelling).\n~> ");
             userPronouns = scanner.nextLine().trim();  // Read user input
-
-            System.out.println();
 
             try {
                 String[] pronounsParts = userPronouns.split("/");
@@ -102,7 +100,7 @@ public class CharacterMethods {
     }
 
     // Method to retrieve existing characters
-    public static String[] getExistingCharacters() {
+    public static String[] getExistingCharacters(boolean DEBUG) {
         // Save the information to a file - still in testing
         try {
             // Load the SQLite JDBC driver
@@ -143,7 +141,9 @@ public class CharacterMethods {
     
             return characters;
         } catch (Exception e) {
-            System.err.println("Error: " + e.getMessage());
+            if (DEBUG) {
+                System.err.println("Error: " + e.getMessage());
+            }
             return new String[0]; // Return an empty array if an error occurs
         }
     }
