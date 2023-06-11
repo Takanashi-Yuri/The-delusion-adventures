@@ -3,12 +3,15 @@ import java.util.Scanner;
 
 public class Main {
     // Set global class variables
-    public static boolean DEBUG = false;
     public static Scanner scanner = new Scanner(System.in);
-    public static String storyName = "";
+    public static boolean done = false;
+    public static boolean doBreak = false;
 
     // Main setion
     public static void main(String[] args) {
+        // Set variables
+        Object[] result = {};
+
         // Show loading screen
         displayLoadingScreen();
 
@@ -16,11 +19,53 @@ public class Main {
         waitForEnter();
 
         while (true) {
-            // Show main menu of the game
-            storyName = displayMainMenu();
+            doBreak = false;
 
-            // Start the main part
-            // loadStory();
+            // Show main menu
+            displayMainMenu();
+
+            while (true) {
+                doBreak = false;
+
+                // Show character menu
+                result = (Object[]) displayCharacterMenu();
+
+                // Retrieve loaded character name
+                String characterName = (String) result[0];
+
+                // check if not returning to main menu
+                doBreak = (Boolean) result[1];
+
+                System.out.println(characterName);
+
+                // Break if returning to main menu
+                if (doBreak) {
+                    break;
+                }
+
+                while (true) {
+                    doBreak = false;
+
+                    // Show story menu
+                    result = (Object[]) displayStoryMenu(characterName);
+
+                    // Retrieve loaded character name
+                    String storyName = (String) result[0];
+
+                    // check if not returning to main menu
+                    doBreak = (Boolean) result[1];
+
+                    System.out.println(storyName + " - " + characterName);
+
+                    // Break if returning to main menu
+                    if (doBreak) {
+                        break;
+                    }
+
+                    // Start the main part
+                    // loadStory();
+                }
+            }
         }
     }
 
@@ -30,7 +75,7 @@ public class Main {
         Utility.sleep(1000);
 
         System.out.println("- Loading astral matter...");
-        Utility.createDirectory(DEBUG);
+        Utility.createDirectory();
         Utility.sleep(1000);
         
         System.out.println("- Planting ash flowers...");
@@ -44,17 +89,17 @@ public class Main {
     public static void waitForEnter() {
         System.out.print("Press Enter to continue...");
         scanner.nextLine();
+
         System.out.println();
     }
 
-    // Method for handling Main menu
-    public static String displayMainMenu() {
-        boolean done = false;
-
+    // Method for displaying main menu
+    public static void displayMainMenu() {
         do {
             String[] mainMenuOptions = {
-                "New - Start a brand new story.",
-                "Load - Load an existing story.",
+                "Start - Start game.",
+                "Settings - Open settings.",
+                "Help - Get help about this game.",
                 "Exit - Exit the program."
             };
 
@@ -62,102 +107,163 @@ public class Main {
             System.out.print("~> ");
 
             if (scanner.hasNextLine()) {
-                String option = scanner.nextLine().trim();
-                System.out.println();
+                String selectedOption = scanner.nextLine().trim();
 
-                switch (option.toLowerCase()) {
-                    case "new":
-                        Object[] infoMainMenu = (Object[]) handleMainMenuNew();
-                        done = (boolean) infoMainMenu[0];
-                        storyName = (String) infoMainMenu[1];
-
-                        break;
-                    case "load":
-                        // Implement the code for loading an existing story
-                        System.out.println("Loading an existing story...");
+                switch (selectedOption.toLowerCase()) {
+                    case "start":
+                        // Just pass to next part of the main method
                         done = true;
+                        break;
+                    case "settings":
+                        // Open method for settings from Main.java
+                        // ...
+                        System.out.println();
+
+                        done = false;
+                        break;
+                    case "help":
+                        // Open method for help from Main.java
+                        // ...
+                        System.out.println();
+                        
+                        done = false;
                         break;
                     case "exit":
                         System.out.println("Leaving the astral dimension. See you next time!");
                         scanner.close(); // Close scanner and free resources
+
+                        // End (kill) program
                         System.exit(1);
                     default:
                         System.out.println("Unknown option, please choose one of the available options.");
+                        System.out.println();
+
+                        done = false;
                         break;
                 }
-
-                System.out.println();
             }
         }
-        while (!done);
+        while (done != true);
 
-        return storyName;
+        System.out.println();
     }
 
-    // Method for handling Main menu new story section
-    public static Object handleMainMenuNew() {
-        boolean done = false;
-        
-        System.out.println("Select existing character or create new one.");
+    // Method for displaying character menu
+    public static Object displayCharacterMenu() {
+        // Set variables
+        String characterName = "";
 
         do {
-            // Retrieve existing characters
-            String[] characters = CharacterManaging.getExistingCharacters(DEBUG);
+            String[] characterMenuOptions = {
+                "New - Create new character.",
+                "Load - Load an existing character.",
+                "Exit - Exit to main menu."
+            };
 
-            // Display character menu
-            System.out.println("Available characters:");
-            for (int i = 0; i < characters.length; i++) {
-                System.out.println("- " + characters[i]);
-            }
-            System.out.println("- New character");
+            System.out.println(String.join("\n", characterMenuOptions));
+            System.out.print("~> ");
 
-            boolean empty = false;
+            if (scanner.hasNextLine()) {
+                String option = scanner.nextLine().trim();
 
-            do {
-                empty = false;
+                switch (option.toLowerCase()) {
+                    case "new":
+                        // Welcome message
+                        System.out.println();
+                        Utility.slowPrint("Hi, my name is Nanami, and I will be your companion on this journey.\n" + "First, we'll create your character that will represent you.\n");
 
-                System.out.print("~> ");
+                        // Create new character
+                        characterName = CharacterManaging.newCharacter(scanner);
 
-                String characterSelection = scanner.nextLine().trim();
+                        done = true;
+                        break;
+                    case "load":
+                        // Load existing character
+                        System.out.println();
+                        characterName = CharacterManaging.loadCharacter(scanner);
 
-                if (characterSelection.equals("New character")) {
-                    // Welcome message
-                    System.out.println();
-                    Utility.slowPrint("Hi, my name is Nanami, and I am your companion on this journey.\n" + "First, we'll create your character that will represent you.\n");
-                    System.out.println();
+                        done = true;
+                        break;
+                    case "exit":
+                        System.out.println();
+                        System.out.println("Returning to main menu...");
 
-                    // Create new character
-                    String[] userInfo = CharacterManaging.createNewCharacter(scanner);
+                        doBreak = true;
+                        done = true;
+                        break;
+                    default:
+                        System.out.println();
+                        System.out.println("Unknown option, please choose one of the available options.");
+                        System.out.println();
 
-                    System.out.println();
-
-                    // Create new story
-                    Object[] storyInfo = (Object[]) StoryManaging.newStory(scanner, userInfo[0], DEBUG);
-                    // done = true;
-                    done = (boolean) storyInfo[0];
-                    storyName = (String) storyInfo[1];
-                    break;
-                } else if (characterSelection.isBlank()) {
-                    System.out.println("Error: Character name cannot be empty!");
-                    empty = true;
-                } else {
-                    // Create new story for existing character
-                    Object[] storyInfo = (Object[]) StoryManaging.newStory(scanner, characterSelection, DEBUG);
-                    done = (boolean) storyInfo[0];
-                    storyName = (String) storyInfo[1];
-                    break;
+                        done = false;
+                        break;
                 }
             }
-            while (empty);
-
-            System.out.println();
         }
-        while (!done);
+        while (done != true);
 
-        return new Object[] {done, storyName};
+        System.out.println();
+
+        return new Object[] {characterName, doBreak};
     }
 
-    public static Object handleMainMenuLoad() {
-        
+    // Method for displaying story menu
+    public static Object displayStoryMenu(String characterName) {
+        // Set variables
+        String storyName = "";
+
+        do {
+            String[] storyMenuOptions = {
+                "New - Create new story.",
+                "Load - Load an existing story.",
+                "Exit - Exit to character menu."
+            };
+
+            System.out.println(String.join("\n", storyMenuOptions));
+            System.out.print("~> ");
+
+            if (scanner.hasNextLine()) {
+                String option = scanner.nextLine().trim();
+
+                switch (option.toLowerCase()) {
+                    case "new":
+                        // Welcome message
+                        System.out.println();
+                        Utility.slowPrint("Okay, let's create new interesting story.\n");
+
+                        // Create new story
+                        storyName = StoryManaging.newStory(scanner, characterName);
+
+                        done = true;
+                        break;
+                    case "load":
+                        System.out.println();
+                        storyName = StoryManaging.loadStory(scanner, characterName);
+
+                        done = true;
+                        break;
+                    case "exit":
+                        System.out.println();
+                        System.out.println("Returning to character menu...");
+
+                        doBreak = true;
+                        done = true;
+                        break;
+                    default:
+                        System.out.println();
+                        System.out.println("Unknown option, please choose one of the available options.");
+                        System.out.println();
+
+                        done = false;
+                        break;
+                }
+            }
+        }
+        while (done != true);
+
+        System.out.println();
+
+        return new Object[] {storyName, doBreak};
     }
 }

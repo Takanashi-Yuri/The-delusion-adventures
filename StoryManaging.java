@@ -7,13 +7,13 @@ import java.sql.DriverManager;
 import java.sql.Statement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 
 public class StoryManaging {
-
     // Create new story for specified character
-    public static Object newStory(Scanner scanner, String characterName, boolean DEBUG) {
+    public static String newStory(Scanner scanner, String characterName) {
+        // Set variables
         boolean done = false;
+        String storyName = "";
 
         // Create new story and save it to the database
         try {
@@ -31,43 +31,32 @@ public class StoryManaging {
             statement.execute(createStoriesTableQuery);
 
             // Retrieve the character's ID from the characters table
-            String getCharacterIdQuery = "SELECT id FROM characters WHERE userName = ?";
+            String getCharacterIdQuery = "SELECT id FROM characters WHERE characterName = ?";
             PreparedStatement getCharacterIdStatement = connection.prepareStatement(getCharacterIdQuery);
             getCharacterIdStatement.setString(1, characterName);
             ResultSet characterIdResult = getCharacterIdStatement.executeQuery();
 
-            int characterId = -1; // Default value if character not found
-            String storyName = "";
+            int characterId = characterIdResult.getInt("id");
 
-            if (characterIdResult.next()) {
-                characterId = characterIdResult.getInt("id");
-
+            do {
                 // Prompt the user to enter the story text
-                System.out.println();
-                System.out.println("Enter the story name (save name).");
-                while (true) {
-                    System.out.print("~> ");
+                System.out.print("Enter the story name (save name).\n~> ");
+
+                if (scanner.hasNextLine()) {
                     storyName = scanner.nextLine().trim();
 
-                    if (!storyName.isBlank()) {
-                        // Insert the story into the stories table
-                        String insertStoryQuery = "INSERT INTO stories (characterId, storyName) VALUES (?, ?)";
-                        PreparedStatement insertStoryStatement = connection.prepareStatement(insertStoryQuery);
-                        insertStoryStatement.setInt(1, characterId);
-                        insertStoryStatement.setString(2, storyName);
-                        insertStoryStatement.executeUpdate();
+                    // Insert the story into the stories table
+                    String insertStoryQuery = "INSERT INTO stories (characterId, storyName) VALUES (?, ?)";
+                    PreparedStatement insertStoryStatement = connection.prepareStatement(insertStoryQuery);
+                    insertStoryStatement.setInt(1, characterId);
+                    insertStoryStatement.setString(2, storyName);
+                    insertStoryStatement.executeUpdate();
 
-                        System.out.println("Story saved successfully!");
-                        done = true;
-                        break;
-                    } else {
-                        System.out.println("Error: Story name cannot be empty!");
-                    }
+                    System.out.println("Story saved successfully!");
+                    done = true;
                 }
-            } else {
-                System.out.println("Character not found!");
-                done = false;
             }
+            while (done != true);
 
             // Close the result set, statements, and connection
             characterIdResult.close();
@@ -75,23 +64,70 @@ public class StoryManaging {
             statement.close();
             connection.close();
 
-            return new Object[] {done, storyName};
-        } catch (SQLException e) {
-            System.out.println("Character not found!");
-            done = false;
-            return done;
+            return storyName;
         } catch (Exception e) {
-            if (DEBUG) {
-                System.err.println("Error: " + e.getMessage());
-            }
-            return done;
+            System.err.println("ERROR: " + e.getMessage());
+            return storyName;
         }
     }
 
     // Load existing story - currently not working
-    public static void loadStory(Scanner scanner) {
-        String introduction = "Please insert your character name for list of existing stories\n~> ";
-        Utility.slowPrint(introduction);
-        String characterName = scanner.nextLine();  // Read user input
+    public static String loadStory(Scanner scanner, String characterName) {
+        // Set variables
+        String chosenStory = "";
+
+        try {
+            // Load the SQLite JDBC driver
+            Class.forName("org.sqlite.JDBC");
+
+            // Connect to the SQLite database
+            Connection connection = DriverManager.getConnection("jdbc:sqlite:data/main.db");
+
+            // Create a statement
+            Statement statement = connection.createStatement();
+
+            // Retrieve the character's ID from the characters table
+            String getCharacterIdQuery = "SELECT id FROM characters WHERE characterName = ?";
+            PreparedStatement getCharacterIdStatement = connection.prepareStatement(getCharacterIdQuery);
+            getCharacterIdStatement.setString(1, characterName);
+            ResultSet characterIdResult = getCharacterIdStatement.executeQuery();
+
+            int characterId = characterIdResult.getInt("id");
+
+            // Retrieve the stories for the character from the stories table
+            String getStoriesQuery = "SELECT storyName FROM stories WHERE characterId = ?";
+            PreparedStatement getStoriesStatement = connection.prepareStatement(getStoriesQuery);
+            getStoriesStatement.setInt(1, characterId);
+            ResultSet storiesResult = getStoriesStatement.executeQuery();
+
+            // Print available stories
+            System.out.println("Available stories:");
+
+            while (storiesResult.next()) {
+                String storyName = storiesResult.getString("storyName");
+                System.out.println("- " + storyName);
+            }
+
+            // Prompt the user to choose a story
+            System.out.print("~> ");
+
+            if (scanner.hasNextLine()) {
+                chosenStory = scanner.nextLine().trim();
+                // Perform further operations with the chosen story if needed
+            }
+
+            // Close the result sets, statements, and connection
+            storiesResult.close();
+            characterIdResult.close();
+            getStoriesStatement.close();
+            getCharacterIdStatement.close();
+            statement.close();
+            connection.close();
+
+            return chosenStory;
+        } catch (Exception e) {
+            System.err.println("ERROR: " + e.getMessage());
+            return chosenStory;
+        }
     }
 }

@@ -30,7 +30,7 @@ public class Utility {
     }
 
     // Create directories if they doesn't exist
-    public static void createDirectory(boolean DEBUG) {
+    public static void createDirectory() {
         List<String> directoryPaths = new ArrayList<>();
         directoryPaths.add("data");
         // directoryPaths.add("path/to/directory2");
@@ -39,18 +39,16 @@ public class Utility {
         for (String directoryPath : directoryPaths) {
             File directory = new File(directoryPath);
 
-            if (!DEBUG) {
-                if (!directory.exists()) {
-                    boolean created = directory.mkdirs();
+            if (!directory.exists()) {
+                boolean created = directory.mkdirs();
 
-                    if (created) {
-                        System.out.println("  - Portal '" + directoryPath + "' created successfully!");
-                    } else {
-                        System.out.println("  - Failed to create the portal '" + directoryPath + "'.");
-                    }
+                if (created) {
+                    System.out.println("  - Portal '" + directoryPath + "' created successfully!");
                 } else {
-                    System.out.println("  - Portal '" + directoryPath + "' already exists.");
+                    System.out.println("  - Failed to create the portal '" + directoryPath + "'.");
                 }
+            } else {
+                System.out.println("  - Portal '" + directoryPath + "' already exists.");
             }
         }
     }
